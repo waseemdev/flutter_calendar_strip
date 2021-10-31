@@ -1,7 +1,7 @@
 library calendar_strip;
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide DateUtils;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import './date-utils.dart';
@@ -24,6 +24,8 @@ class CalendarStrip extends StatefulWidget {
   final Icon rightIcon;
   final Icon leftIcon;
   final String locale;
+  final TextStyle dayTextStyle;
+  final TextStyle dayNameTextStyle;
 
   CalendarStrip({
     this.addSwipeGesture = false,
@@ -41,6 +43,8 @@ class CalendarStrip extends StatefulWidget {
     this.markedDates,
     this.rightIcon,
     this.leftIcon,
+    this.dayTextStyle,
+    this.dayNameTextStyle,
     this.locale = 'en_US',
   });
 
@@ -268,14 +272,14 @@ class CalendarStripState extends State<CalendarStrip>
 
   rightIconWidget() {
     if (!isOnEndingWeek) {
-      return InkWell(
-        child: widget.rightIcon ??
+      return IconButton(
+        icon: widget.rightIcon ??
             Icon(
               CupertinoIcons.right_chevron,
               size: 30,
               color: nullOrDefault(widget.iconColor, Colors.black),
             ),
-        onTap: onNextRow,
+        onPressed: onNextRow,
         splashColor: Colors.black26,
       );
     } else {
@@ -285,14 +289,14 @@ class CalendarStripState extends State<CalendarStrip>
 
   leftIconWidget() {
     if (!isOnStartingWeek) {
-      return InkWell(
-        child: widget.leftIcon ??
+      return IconButton(
+        icon: widget.leftIcon ??
             Icon(
               CupertinoIcons.left_chevron,
               size: 30,
               color: nullOrDefault(widget.iconColor, Colors.black),
             ),
-        onTap: onPrevRow,
+        onPressed: onPrevRow,
         splashColor: Colors.black26,
       );
     } else {
@@ -356,7 +360,7 @@ class CalendarStripState extends State<CalendarStrip>
     if (widget.dateTileBuilder != null) {
       return Expanded(
         child: SlideFadeTransition(
-          delay: 30 + (30 * rowIndex),
+          delay: (30 * rowIndex),
           id: "${date.day}${date.month}${date.year}",
           curve: Curves.ease,
           child: InkWell(
@@ -378,13 +382,13 @@ class CalendarStripState extends State<CalendarStrip>
     }
 
     bool isSelectedDate = date.compareTo(selectedDate) == 0;
-    var normalStyle = TextStyle(
+    var normalStyle = widget.dayTextStyle ?? TextStyle(
         fontSize: 17,
         fontWeight: FontWeight.w800,
         color: isDateOutOfRange ? Colors.black26 : Colors.black54);
     return Expanded(
       child: SlideFadeTransition(
-        delay: 30 + (30 * rowIndex),
+        delay: (30 * rowIndex),
         id: "${date.day}${date.month}${date.year}",
         curve: Curves.ease,
         child: InkWell(
@@ -400,7 +404,7 @@ class CalendarStripState extends State<CalendarStrip>
               children: [
                 Text(
                   DateFormat('EEEE', widget.locale).format(date),
-                  style: TextStyle(
+                  style: widget.dayNameTextStyle ?? TextStyle(
                     fontSize: 14.5,
                     color: !isSelectedDate ? Colors.black : Colors.white,
                   ),
@@ -449,7 +453,7 @@ class SlideFadeTransitionState extends State<SlideFadeTransition>
   void initState() {
     super.initState();
     _animController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 400));
+        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
     final _curve = CurvedAnimation(
         curve: widget.curve != null ? widget.curve : Curves.decelerate,
         parent: _animController);
