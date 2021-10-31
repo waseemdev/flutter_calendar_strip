@@ -26,6 +26,9 @@ class CalendarStrip extends StatefulWidget {
   final String locale;
   final TextStyle dayTextStyle;
   final TextStyle dayNameTextStyle;
+  final TextStyle selectedDayTextStyle;
+  final TextStyle selectedDayNameTextStyle;
+  final Color selectedDayColor;
 
   CalendarStrip({
     this.addSwipeGesture = false,
@@ -45,6 +48,9 @@ class CalendarStrip extends StatefulWidget {
     this.leftIcon,
     this.dayTextStyle,
     this.dayNameTextStyle,
+    this.selectedDayTextStyle,
+    this.selectedDayNameTextStyle,
+    this.selectedDayColor = Colors.blue,
     this.locale = 'en_US',
   });
 
@@ -276,7 +282,7 @@ class CalendarStripState extends State<CalendarStrip>
         icon: widget.rightIcon ??
             Icon(
               CupertinoIcons.right_chevron,
-              size: 30,
+              size: 24,
               color: nullOrDefault(widget.iconColor, Colors.black),
             ),
         onPressed: onNextRow,
@@ -293,7 +299,7 @@ class CalendarStripState extends State<CalendarStrip>
         icon: widget.leftIcon ??
             Icon(
               CupertinoIcons.left_chevron,
-              size: 30,
+              size: 24,
               color: nullOrDefault(widget.iconColor, Colors.black),
             ),
         onPressed: onPrevRow,
@@ -382,7 +388,7 @@ class CalendarStripState extends State<CalendarStrip>
     }
 
     bool isSelectedDate = date.compareTo(selectedDate) == 0;
-    var normalStyle = widget.dayTextStyle ?? TextStyle(
+    var normalStyle = TextStyle(
         fontSize: 17,
         fontWeight: FontWeight.w800,
         color: isDateOutOfRange ? Colors.black26 : Colors.black54);
@@ -397,20 +403,21 @@ class CalendarStripState extends State<CalendarStrip>
             alignment: Alignment.center,
             padding: EdgeInsets.only(top: 8, left: 5, right: 5, bottom: 5),
             decoration: BoxDecoration(
-              color: !isSelectedDate ? Colors.transparent : Colors.blue,
+              color: !isSelectedDate ? Colors.transparent : widget.selectedDayColor,
               borderRadius: BorderRadius.all(Radius.circular(60)),
             ),
             child: Column(
               children: [
                 Text(
-                  DateFormat('EEEE', widget.locale).format(date),
-                  style: widget.dayNameTextStyle ?? TextStyle(
+                  DateFormat('E', widget.locale).format(date),
+                  style: (isSelectedDate ? widget.selectedDayNameTextStyle : widget.dayNameTextStyle) ?? TextStyle(
                     fontSize: 14.5,
                     color: !isSelectedDate ? Colors.black : Colors.white,
                   ),
                 ),
                 Text(date.day.toString(),
-                    style: !isSelectedDate ? normalStyle : selectedDateStyle),
+                    style: (isSelectedDate ? widget.selectedDayTextStyle : widget.dayTextStyle)
+                      ?? (!isSelectedDate ? normalStyle : selectedDateStyle)),
               ],
             ),
           ),
